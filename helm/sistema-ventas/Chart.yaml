@@ -1,0 +1,13 @@
+apiVersion: v2
+name: sistema-ventas
+description: Helm chart for Sistema de Ventas API
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - ventas
+  - api
+  - dotnet
+maintainers:
+  - name: Jr13green
+home: https://github.com/Jr13green/Sistema_Ventas_Moderno
