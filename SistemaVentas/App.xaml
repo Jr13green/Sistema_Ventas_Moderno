@@ -1,9 +1,12 @@
 ﻿<Application x:Class="SistemaVentas.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:SistemaVentas.Converters"
              xmlns:local="clr-namespace:SistemaVentas"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        <converters:DecimalToStringConverter x:Key="DecimalToStringConverter" />
     </Application.Resources>
 </Application>

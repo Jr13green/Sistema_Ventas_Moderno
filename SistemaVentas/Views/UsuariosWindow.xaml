@@ -6,8 +6,8 @@
         Background="#F5F5F5">
     <Grid>
         <!-- Header -->
-        <Border Background="#2C3E50" Foreground="White" Padding="20" Height="60" VerticalAlignment="Top">
-            <TextBlock Text="Gestión de Usuarios" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
+        <Border Background="#2C3E50" Padding="20" Height="60" VerticalAlignment="Top">
+            <TextBlock Text="Gestión de Usuarios" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" Foreground="White" />
         </Border>
 
         <!-- Contenido -->
@@ -29,9 +29,13 @@
                     <TextBox Text="{Binding NumeroNuevo}" Padding="10" Height="35" Margin="0,0,0,15" />
 
                     <TextBlock Text="Rol" FontWeight="Bold" Margin="0,0,0,5" />
-                    <ComboBox ItemsSource="{Binding Source={x:Static local:Roles}}"
-                              SelectedItem="{Binding RolSeleccionado}"
-                              Height="35" Margin="0,0,0,20" Padding="10" />
+                    <ComboBox SelectedValue="{Binding RolSeleccionado}"
+                              SelectedValuePath="Content"
+                              Height="35" Margin="0,0,0,20" Padding="10">
+                        <ComboBoxItem Content="Vendedor" />
+                        <ComboBoxItem Content="Administrador" />
+                        <ComboBoxItem Content="Propietario" />
+                    </ComboBox>
 
                     <Button Command="{Binding CrearUsuarioCommand}"
                             Content="Crear Usuario"
@@ -71,7 +75,7 @@
             </StackPanel>
 
             <!-- Botones Inferiores -->
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Height="70" Background="White" BorderBrush="#DDD" BorderThickness="0,1,0,0" Padding="20" Grid.ColumnSpan="2">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Height="70" Background="White" Margin="20,0" Grid.ColumnSpan="2">
                 <Button Command="{Binding CargarUsuariosCommand}"
                         Content="Recargar"
                         Background="#3498DB"

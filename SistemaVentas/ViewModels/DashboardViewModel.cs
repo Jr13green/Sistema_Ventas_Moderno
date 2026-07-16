@@ -256,11 +256,12 @@ namespace SistemaVentas.ViewModels
                         DateTime.Today
                     );
 
-                var mensaje = $"""Reporte del Último Mes:
-                    Ventas: L {ventas:N2}
-                    Premios: L {premios:N2}
-                    Ganancia: L {ganancia:N2}
-                    Transacciones: {transacciones}""";
+                var mensaje =
+                    $"Reporte del Último Mes:{Environment.NewLine}" +
+                    $"Ventas: L {ventas:N2}{Environment.NewLine}" +
+                    $"Premios: L {premios:N2}{Environment.NewLine}" +
+                    $"Ganancia: L {ganancia:N2}{Environment.NewLine}" +
+                    $"Transacciones: {transacciones}";
 
                 System.Windows.MessageBox.Show(mensaje, "Reporte");
             }

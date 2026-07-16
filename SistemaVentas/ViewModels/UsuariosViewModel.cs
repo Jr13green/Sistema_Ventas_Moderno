@@ -77,7 +77,7 @@ namespace SistemaVentas.ViewModels
 
         #region Métodos
 
-        private async Task CargarUsuariosAsync()
+        public async Task CargarUsuariosAsync()
         {
             try
             {

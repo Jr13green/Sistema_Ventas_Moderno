@@ -6,8 +6,8 @@
         Background="#F5F5F5">
     <Grid>
         <!-- Header -->
-        <Border Background="#2C3E50" Foreground="White" Padding="20" Height="60" VerticalAlignment="Top">
-            <TextBlock Text="Reportes y Análisis" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
+        <Border Background="#2C3E50" Padding="20" Height="60" VerticalAlignment="Top">
+            <TextBlock Text="Reportes y Análisis" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" Foreground="White" />
         </Border>
 
         <!-- Contenido -->

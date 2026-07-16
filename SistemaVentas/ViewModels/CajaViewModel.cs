@@ -22,6 +22,7 @@ namespace SistemaVentas.ViewModels
         private string _tipoAjuste;
         private bool _cargando;
         private ObservableCollection<(string tipo, decimal monto, string motivo, DateTime fecha)> _movimientos;
+        public static string[] TiposAjuste { get; } = { "Ingreso", "Egreso" };
 
         public ICommand AgregarAjusteCommand { get; }
         public ICommand CargarMovimientosCommand { get; }

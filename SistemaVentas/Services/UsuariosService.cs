@@ -1,242 +1,110 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Data.Sqlite;
 using SistemaVentas.Models;
 
 namespace SistemaVentas.Services
 {
     /// <summary>
-    /// Servicio para gestionar todas las operaciones relacionadas con usuarios
-    /// Incluye autenticación, creación, actualización y gestión de permisos
+    /// Servicio para gestionar operaciones de usuarios para la capa MVVM.
     /// </summary>
     public class UsuariosService
     {
         private readonly BaseDatosService _baseDatos;
+        private static readonly List<Usuario> _usuarios = new();
+        private static long _nextId = 1;
 
         public UsuariosService(BaseDatosService baseDatos)
         {
-            _baseDatos = baseDatos ?? throw new ArgumentNullException(nameof(baseDatos));
+            _baseDatos = baseDatos;
         }
 
-        /// <summary>
-        /// Autentica un usuario con su nombre de usuario y contraseña
-        /// </summary>
-        /// <returns>Usuario si es válido, null si no existe o contraseña es incorrecta</returns>
-        public async Task<Usuario> AutenticarAsync(string nombreUsuario, string contrasena)
+        public Task<Usuario> AutenticarAsync(string nombreUsuario, string contrasena)
         {
             if (string.IsNullOrWhiteSpace(nombreUsuario) || string.IsNullOrWhiteSpace(contrasena))
-                return null;
+                return Task.FromResult<Usuario>(null);
 
-            string sql = @"
-                SELECT Id, NombreCompleto, NombreUsuario, Rol, Activo, FechaCreacion
-                FROM Usuarios
-                WHERE NombreUsuario = @nombreUsuario AND Activo = 1
-                LIMIT 1;
-            ";
+            var usuario = _usuarios.FirstOrDefault(u =>
+                u.Activo &&
+                string.Equals(u.NombreUsuario, nombreUsuario, StringComparison.OrdinalIgnoreCase));
 
-            try
-            {
-                using (SqliteConnection conexion = _baseDatos.ObtenerConexion())
-                {
-                    await conexion.OpenAsync();
-                    using (SqliteCommand comando = new SqliteCommand(sql, conexion))
-                    {
-                        comando.Parameters.AddWithValue("@nombreUsuario", nombreUsuario);
-                        using (SqliteDataReader lector = await comando.ExecuteReaderAsync())
-                        {
-                            if (!await lector.ReadAsync())
-                                return null;
-
-                            // Aquí verificarías la contraseña hasheada
-                            // Por ahora retornamos el usuario si existe
-                            return new Usuario
-                            {
-                                Id = lector.GetInt64(0),
-                                NombreCompleto = lector.GetString(1),
-                                NombreUsuario = lector.GetString(2),
-                                Rol = lector.GetString(3),
-                                Activo = lector.GetInt32(4) == 1
-                            };
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error en autenticación: {ex.Message}");
-                return null;
-            }
+            return Task.FromResult(usuario);
         }
 
-        /// <summary>
-        /// Crea un nuevo usuario en el sistema
-        /// </summary>
-        public async Task<(bool exito, string mensaje, long usuarioId)> CrearUsuarioAsync(Usuario usuario, string contrasena)
+        public Task<(bool exito, string mensaje, long usuarioId)> CrearUsuarioAsync(Usuario usuario, string contrasena)
         {
             if (usuario == null || string.IsNullOrWhiteSpace(usuario.NombreUsuario) || string.IsNullOrWhiteSpace(contrasena))
-                return (false, "Datos incompletos", 0);
+                return Task.FromResult((false, "Datos incompletos", 0L));
 
-            try
-            {
-                // Verificar si el usuario ya existe
-                string verificarSql = "SELECT COUNT(*) FROM Usuarios WHERE NombreUsuario = @nombreUsuario;";
-                var resultado = await _baseDatos.ExecuteScalarAsync(verificarSql, 
-                    new Dictionary<string, object> { { "nombreUsuario", usuario.NombreUsuario } });
+            if (_usuarios.Any(u => string.Equals(u.NombreUsuario, usuario.NombreUsuario, StringComparison.OrdinalIgnoreCase)))
+                return Task.FromResult((false, "El usuario ya existe", 0L));
 
-                if (Convert.ToInt32(resultado) > 0)
-                    return (false, "El usuario ya existe", 0);
+            usuario.Id = _nextId++;
+            usuario.Activo = true;
+            _usuarios.Add(usuario);
 
-                // Crear nuevo usuario
-                string sql = @"
-                    INSERT INTO Usuarios 
-                    (NombreCompleto, NombreUsuario, Contrasena, Rol, Activo, FechaCreacion)
-                    VALUES (@nombreCompleto, @nombreUsuario, @contrasena, @rol, 1, CURRENT_TIMESTAMP);
-                    SELECT last_insert_rowid();
-                ";
+            return Task.FromResult((true, "Usuario creado exitosamente", usuario.Id));
+        }
 
-                var parametros = new Dictionary<string, object>
-                {
-                    { "nombreCompleto", usuario.NombreCompleto ?? "" },
-                    { "nombreUsuario", usuario.NombreUsuario },
-                    { "contrasena", contrasena }, // En producción: HashPassword(contrasena)
-                    { "rol", usuario.Rol ?? "Vendedor" }
-                };
+        public Task<List<Usuario>> ObtenerVendedoresActivosAsync()
+        {
+            var usuarios = _usuarios
+                .Where(u => u.Activo && string.Equals(u.Rol, "Vendedor", StringComparison.OrdinalIgnoreCase))
+                .OrderBy(u => u.NombreCompleto)
+                .ToList();
 
-                using (SqliteConnection conexion = _baseDatos.ObtenerConexion())
-                {
-                    await conexion.OpenAsync();
-                    using (SqliteCommand comando = new SqliteCommand(sql, conexion))
-                    {
-                        foreach (var param in parametros)
-                            comando.Parameters.AddWithValue("@" + param.Key, param.Value);
+            return Task.FromResult(usuarios);
+        }
 
-                        object id = await comando.ExecuteScalarAsync();
-                        return (true, "Usuario creado exitosamente", Convert.ToInt64(id ?? 0));
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error creando usuario: {ex.Message}");
-                return (false, $"Error: {ex.Message}", 0);
-            }
+        public Task<bool> CambiarEstadoUsuarioAsync(long usuarioId, bool activo)
+        {
+            var usuario = _usuarios.FirstOrDefault(u => u.Id == usuarioId);
+            if (usuario == null)
+                return Task.FromResult(false);
+
+            usuario.Activo = activo;
+            return Task.FromResult(true);
+        }
+
+        public Task<Usuario> ObtenerUsuarioPorIdAsync(long usuarioId)
+        {
+            var usuario = _usuarios.FirstOrDefault(u => u.Id == usuarioId);
+            return Task.FromResult(usuario);
         }
 
         /// <summary>
-        /// Obtiene todos los usuarios vendedores activos
+        /// Sobrecarga MVVM para crear usuario desde formulario.
         /// </summary>
-        public async Task<List<Usuario>> ObtenerVendedoresActivosAsync()
+        public async Task<Usuario> CrearUsuarioAsync(string nombreCompleto, string numero, string rol)
         {
-            string sql = @"
-                SELECT Id, NombreCompleto, NombreUsuario, Rol, Activo
-                FROM Usuarios
-                WHERE Rol = 'Vendedor' AND Activo = 1
-                ORDER BY NombreCompleto;
-            ";
+            string usuarioBase = (nombreCompleto ?? string.Empty).Trim().ToLower().Replace(" ", ".");
+            if (string.IsNullOrWhiteSpace(usuarioBase))
+                usuarioBase = "usuario";
 
-            var usuarios = new List<Usuario>();
-
-            try
+            var nuevoUsuario = new Usuario
             {
-                using (SqliteConnection conexion = _baseDatos.ObtenerConexion())
-                {
-                    await conexion.OpenAsync();
-                    using (SqliteCommand comando = new SqliteCommand(sql, conexion))
-                    {
-                        using (SqliteDataReader lector = await comando.ExecuteReaderAsync())
-                        {
-                            while (await lector.ReadAsync())
-                            {
-                                usuarios.Add(new Usuario
-                                {
-                                    Id = lector.GetInt64(0),
-                                    NombreCompleto = lector.GetString(1),
-                                    NombreUsuario = lector.GetString(2),
-                                    Rol = lector.GetString(3),
-                                    Activo = lector.GetInt32(4) == 1
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error obteniendo vendedores: {ex.Message}");
-            }
+                NombreCompleto = nombreCompleto ?? string.Empty,
+                NombreUsuario = $"{usuarioBase}.{DateTime.Now:HHmmss}",
+                Numero = numero ?? string.Empty,
+                Rol = string.IsNullOrWhiteSpace(rol) ? "Vendedor" : rol,
+                Activo = true
+            };
 
-            return usuarios;
+            var (exito, _, usuarioId) = await CrearUsuarioAsync(nuevoUsuario, "Temporal123!");
+            if (!exito)
+                return null;
+
+            nuevoUsuario.Id = usuarioId;
+            return nuevoUsuario;
         }
 
         /// <summary>
-        /// Activa o desactiva un usuario
+        /// Elimina (desactiva) un usuario.
         /// </summary>
-        public async Task<bool> CambiarEstadoUsuarioAsync(long usuarioId, bool activo)
+        public Task<bool> EliminarUsuarioAsync(long usuarioId)
         {
-            string sql = "UPDATE Usuarios SET Activo = @activo WHERE Id = @id;";
-            
-            try
-            {
-                var parametros = new Dictionary<string, object>
-                {
-                    { "activo", activo ? 1 : 0 },
-                    { "id", usuarioId }
-                };
-
-                int filas = await _baseDatos.ExecuteNonQueryAsync(sql, parametros);
-                return filas > 0;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error cambiando estado: {ex.Message}");
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Obtiene un usuario por su ID
-        /// </summary>
-        public async Task<Usuario> ObtenerUsuarioPorIdAsync(long usuarioId)
-        {
-            string sql = @"
-                SELECT Id, NombreCompleto, NombreUsuario, Rol, Activo
-                FROM Usuarios
-                WHERE Id = @id
-                LIMIT 1;
-            ";
-
-            try
-            {
-                using (SqliteConnection conexion = _baseDatos.ObtenerConexion())
-                {
-                    await conexion.OpenAsync();
-                    using (SqliteCommand comando = new SqliteCommand(sql, conexion))
-                    {
-                        comando.Parameters.AddWithValue("@id", usuarioId);
-                        using (SqliteDataReader lector = await comando.ExecuteReaderAsync())
-                        {
-                            if (await lector.ReadAsync())
-                            {
-                                return new Usuario
-                                {
-                                    Id = lector.GetInt64(0),
-                                    NombreCompleto = lector.GetString(1),
-                                    NombreUsuario = lector.GetString(2),
-                                    Rol = lector.GetString(3),
-                                    Activo = lector.GetInt32(4) == 1
-                                };
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error obteniendo usuario: {ex.Message}");
-            }
-
-            return null;
+            return CambiarEstadoUsuarioAsync(usuarioId, false);
         }
     }
 }
