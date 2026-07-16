@@ -1,0 +1,123 @@
+<Window x:Class="SistemaVentas.Views.VentaWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Nueva Venta" Height="600" Width="800"
+        WindowStartupLocation="CenterScreen"
+        Background="#F5F5F5">
+    <Grid>
+        <!-- Header -->
+        <Border Background="#2C3E50" Padding="20" Height="60" VerticalAlignment="Top">
+            <TextBlock Text="Crear Nueva Venta" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" Foreground="White" />
+        </Border>
+
+        <!-- Contenido -->
+        <ScrollViewer Margin="0,60,0,80">
+            <StackPanel Margin="20">
+                <!-- Seleccionar Sorteo -->
+                <Border BorderBrush="#DDD" BorderThickness="1" Padding="15" Margin="0,0,0,15" Background="White">
+                    <StackPanel>
+                        <TextBlock Text="Sorteo" FontWeight="Bold" Margin="0,0,0,10" />
+                        <ComboBox ItemsSource="{Binding SorteosDia}"
+                                  SelectedItem="{Binding SorteoSeleccionado}"
+                                  DisplayMemberPath="Nombre"
+                                  Padding="10"
+                                  Height="35" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Número -->
+                <Border BorderBrush="#DDD" BorderThickness="1" Padding="15" Margin="0,0,0,15" Background="White">
+                    <StackPanel>
+                        <TextBlock Text="Número (2 dígitos)" FontWeight="Bold" Margin="0,0,0,10" />
+                        <TextBox Text="{Binding NumeroIngresado}"
+                                 Padding="10"
+                                 Height="35"
+                                 MaxLength="2" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Monto -->
+                <Border BorderBrush="#DDD" BorderThickness="1" Padding="15" Margin="0,0,0,15" Background="White">
+                    <StackPanel>
+                        <TextBlock Text="Monto (L)" FontWeight="Bold" Margin="0,0,0,10" />
+                        <TextBox Text="{Binding MontoIngresado}"
+                                 Padding="10"
+                                 Height="35" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Botón Agregar -->
+                <Button Command="{Binding AgregarJugadaCommand}"
+                        Content="Agregar Jugada"
+                        Background="#27AE60"
+                        Foreground="White"
+                        Padding="10"
+                        Height="40"
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Margin="0,0,0,30" />
+
+                <!-- DataGrid de Jugadas -->
+                <TextBlock Text="Jugadas Agregadas" FontWeight="Bold" FontSize="14" Margin="0,0,0,10" />
+                <DataGrid ItemsSource="{Binding JugadasAgregadas}"
+                          AutoGenerateColumns="False"
+                          Height="250"
+                          Margin="0,0,0,20"
+                          Background="White">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Sorteo" Binding="{Binding Sorteo}" Width="*" />
+                        <DataGridTextColumn Header="Número" Binding="{Binding Numero}" Width="100" />
+                        <DataGridTextColumn Header="Monto" Binding="{Binding Monto, StringFormat='L {0:N2}'}" Width="100" />
+                        <DataGridTemplateColumn Header="Acción" Width="80">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="Eliminar"
+                                            Command="{Binding DataContext.EliminarJugadaCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}"
+                                            Background="#E74C3C"
+                                            Foreground="White"
+                                            Padding="5" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Total -->
+                <Border BorderBrush="#27AE60" BorderThickness="2" Padding="15" Background="#ECFDF5">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock Text="Total: L " FontWeight="Bold" FontSize="16" />
+                        <TextBlock Text="{Binding TotalVenta, StringFormat={}{0:N2}}" FontWeight="Bold" FontSize="16" Foreground="#27AE60" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Botones Inferiores -->
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Height="70" Background="White" Margin="20,0">
+            <Button Command="{Binding LimpiarCommand}"
+                    Content="Limpiar"
+                    Background="#95A5A6"
+                    Foreground="White"
+                    Padding="20,10"
+                    Margin="0,0,10,0"
+                    FontWeight="Bold" />
+            <Button Command="{Binding GuardarVentaCommand}"
+                    Content="Guardar Venta"
+                    Background="#27AE60"
+                    Foreground="White"
+                    Padding="20,10"
+                    FontWeight="Bold" />
+        </StackPanel>
+
+        <!-- Loading -->
+        <Border Background="Black" Opacity="0.3"
+                Visibility="{Binding Cargando, Converter={StaticResource BoolToVisibilityConverter}}">
+            <TextBlock Text="Procesando..."
+                       Foreground="White"
+                       FontSize="18"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center" />
+        </Border>
+    </Grid>
+</Window>
