@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- namespace.yaml
+- deployment.yaml
+- service.yaml
+- ingress.yaml
+- hpa.yaml
+
+namespace: sistema-ventas
+
+commonLabels:
+  app.kubernetes.io/name: sistema-ventas
+  app.kubernetes.io/managed-by: kustomize
+
+images:
+- name: ghcr.io/jr13green/sistema-ventas
+  newTag: latest

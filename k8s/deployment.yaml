@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sistema-ventas-api
+  namespace: sistema-ventas
+  labels:
+    app: sistema-ventas-api
+    version: "1.0.0"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sistema-ventas-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: sistema-ventas-api
+        version: "1.0.0"
+    spec:
+      containers:
+      - name: api
+        image: ghcr.io/jr13green/sistema-ventas:latest
+        ports:
+        - containerPort: 5000
+          name: http
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+        - name: ASPNETCORE_URLS
+          value: "http://+:5000"
+        - name: Security__JwtSecretKey
+          valueFrom:
+            secretKeyRef:
+              name: sistema-ventas-secrets
+              key: jwt-secret
+        - name: ConnectionStrings__Default
+          valueFrom:
+            secretKeyRef:
+              name: sistema-ventas-secrets
+              key: connection-string
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          readOnlyRootFilesystem: true
+      securityContext:
+        fsGroup: 1000

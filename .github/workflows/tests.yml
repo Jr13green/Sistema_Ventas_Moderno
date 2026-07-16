@@ -19,10 +19,10 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore
-        run: dotnet restore /home/runner/work/Sistema_Ventas_Moderno/Sistema_Ventas_Moderno/SistemaVentas.Tests/SistemaVentas.Tests.csproj /p:EnableWindowsTargeting=true
+        run: dotnet restore SistemaVentas.Tests/SistemaVentas.Tests.csproj /p:EnableWindowsTargeting=true
 
       - name: Build
-        run: dotnet build /home/runner/work/Sistema_Ventas_Moderno/Sistema_Ventas_Moderno/SistemaVentas.Tests/SistemaVentas.Tests.csproj --configuration Release --no-restore /p:EnableWindowsTargeting=true
+        run: dotnet build SistemaVentas.Tests/SistemaVentas.Tests.csproj --configuration Release --no-restore /p:EnableWindowsTargeting=true
 
       - name: Test with coverage
-        run: dotnet test /home/runner/work/Sistema_Ventas_Moderno/Sistema_Ventas_Moderno/SistemaVentas.Tests/SistemaVentas.Tests.csproj --configuration Release --no-build /p:EnableWindowsTargeting=true --collect:"XPlat Code Coverage"
+        run: dotnet test SistemaVentas.Tests/SistemaVentas.Tests.csproj --configuration Release --no-build /p:EnableWindowsTargeting=true --collect:"XPlat Code Coverage"

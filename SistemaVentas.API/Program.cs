@@ -79,6 +79,7 @@ var app = builder.Build();
 
 // ── Middleware pipeline ───────────────────────────────────────────────────────
 app.UseMiddleware<ErrorHandlingMiddleware>();
+app.UseMiddleware<SecurityHeadersMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
@@ -92,6 +93,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("SistemaVentasPolicy");
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ApiKeyMiddleware>();
 
 if (bool.TryParse(builder.Configuration["Api:EnableRateLimiting"], out var rateLimit) && rateLimit)
     app.UseMiddleware<RateLimitingMiddleware>();
