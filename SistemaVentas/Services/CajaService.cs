@@ -18,6 +18,16 @@ namespace SistemaVentas.Services
             return Task.CompletedTask;
         }
 
+        public virtual Task<(bool exito, string mensaje)> RegistrarMovimientoAsync(
+            string tipo, decimal monto, string descripcion)
+        {
+            if (monto <= 0)
+                return Task.FromResult((false, "El monto debe ser mayor que cero."));
+            if (string.IsNullOrWhiteSpace(tipo))
+                return Task.FromResult((false, "El tipo de movimiento es requerido."));
+            return Task.FromResult((true, $"Movimiento de {tipo} por L{monto:N2} registrado."));
+        }
+
         public virtual Task<(decimal totalIngresos, decimal totalEgresos, decimal saldoFinal)> ObtenerResumenCajaPorFechaAsync(DateTime fecha)
         {
             return Task.FromResult((0m, 0m, 0m));

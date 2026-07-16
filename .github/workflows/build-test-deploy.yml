@@ -1,0 +1,129 @@
+name: Build, Test & Deploy
+
+on:
+  push:
+    branches: [ "main", "feature/**", "release/**" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  SOLUTION_PATH: '.'
+
+jobs:
+  # ── Build & Test ───────────────────────────────────────────────────────────
+  build-test:
+    name: Build & Test
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: |
+          dotnet restore SistemaVentas/SistemaVentas.csproj /p:EnableWindowsTargeting=true
+          dotnet restore SistemaVentas.Tests/SistemaVentas.Tests.csproj /p:EnableWindowsTargeting=true
+          dotnet restore SistemaVentas.API/SistemaVentas.API.csproj /p:EnableWindowsTargeting=true
+
+      - name: Build - Main project
+        run: dotnet build SistemaVentas/SistemaVentas.csproj --configuration Release --no-restore /p:EnableWindowsTargeting=true
+
+      - name: Build - API project
+        run: dotnet build SistemaVentas.API/SistemaVentas.API.csproj --configuration Release --no-restore /p:EnableWindowsTargeting=true
+
+      - name: Build - Tests project
+        run: dotnet build SistemaVentas.Tests/SistemaVentas.Tests.csproj --configuration Release --no-restore /p:EnableWindowsTargeting=true
+
+      - name: Run tests with coverage
+        run: |
+          dotnet test SistemaVentas.Tests/SistemaVentas.Tests.csproj `
+            --configuration Release `
+            --no-build `
+            /p:EnableWindowsTargeting=true `
+            --collect:"XPlat Code Coverage" `
+            --results-directory TestResults `
+            --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: TestResults/
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: TestResults/**/coverage.cobertura.xml
+
+  # ── Security Scan ──────────────────────────────────────────────────────────
+  security-scan:
+    name: Security Scan
+    runs-on: windows-latest
+    needs: build-test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore SistemaVentas.API/SistemaVentas.API.csproj /p:EnableWindowsTargeting=true
+
+      - name: NuGet vulnerability scan
+        run: dotnet list SistemaVentas.API/SistemaVentas.API.csproj package --vulnerable --include-transitive
+
+  # ── Staging Deploy ─────────────────────────────────────────────────────────
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: windows-latest
+    needs: [ build-test, security-scan ]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: staging
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Publish API
+        run: |
+          dotnet publish SistemaVentas.API/SistemaVentas.API.csproj `
+            --configuration Release `
+            --output ./publish/api `
+            /p:EnableWindowsTargeting=true
+
+      - name: Upload staging artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-staging-artifact
+          path: ./publish/api/
+          retention-days: 7
+
+      - name: Deploy notification
+        run: |
+          echo "Staging deployment artifact uploaded successfully."
+          echo "Manual deployment step: copy artifact to staging server."

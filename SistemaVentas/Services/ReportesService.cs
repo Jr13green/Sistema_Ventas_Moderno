@@ -19,6 +19,16 @@ namespace SistemaVentas.Services
             return Task.FromResult(new List<(string, decimal, int)>());
         }
 
+        public virtual Task<List<(long usuarioId, string nombre, decimal total, int ventas)>> ObtenerTopVendedoresConIdAsync(DateTime fechaInicio, DateTime fechaFin, int limite)
+        {
+            return Task.FromResult(new List<(long, string, decimal, int)>());
+        }
+
+        public virtual Task<List<(string sorteoNombre, DateTime fecha, string numero, decimal monto, string vendedor)>> ObtenerGanadoresAsync(DateTime fechaInicio, DateTime fechaFin)
+        {
+            return Task.FromResult(new List<(string, DateTime, string, decimal, string)>());
+        }
+
         public virtual Task<string> ExportarVentasCSVAsync(DateTime fechaInicio, DateTime fechaFin)
         {
             const string encabezado = "Fecha,Venta,Premio,Ganancia";
