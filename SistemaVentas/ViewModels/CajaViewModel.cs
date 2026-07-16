@@ -109,7 +109,7 @@ namespace SistemaVentas.ViewModels
                     detalle: $"{TipoAjuste} de L {MontoAjuste:N2}: {MotivoAjuste}"
                 );
 
-                System.Windows.MessageBox.Show("Ajuste registrado correctamente", "Éxito");
+                MostrarMensaje("Ajuste registrado correctamente", "Éxito");
                 await InicializarAsync();
                 Limpiar();
             }

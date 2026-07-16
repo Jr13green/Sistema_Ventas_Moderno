@@ -9,12 +9,12 @@ namespace SistemaVentas.Services
     /// </summary>
     public class NotificacionesService
     {
-        public Task<int> ObtenerConteoNoLeidasAsync()
+        public virtual Task<int> ObtenerConteoNoLeidasAsync()
         {
             return Task.FromResult(0);
         }
 
-        public Task<List<Notificacion>> ObtenerNotificacionesActivasAsync(int limite)
+        public virtual Task<List<Notificacion>> ObtenerNotificacionesActivasAsync(int limite)
         {
             return Task.FromResult(new List<Notificacion>());
         }

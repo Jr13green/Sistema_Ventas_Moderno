@@ -7,8 +7,8 @@ namespace SistemaVentas.Services
     /// </summary>
     public class ConfiguracionService
     {
-        public Task InicializarCacheAsync() => Task.CompletedTask;
+        public virtual Task InicializarCacheAsync() => Task.CompletedTask;
 
-        public string ObtenerNombreNegocio() => "Sistema de Ventas Diaria Familiar";
+        public virtual string ObtenerNombreNegocio() => "Sistema de Ventas Diaria Familiar";
     }
 }

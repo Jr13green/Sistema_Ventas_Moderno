@@ -1,0 +1,28 @@
+name: Tests
+
+on:
+  push:
+    branches: ["main", "feature/**"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore /home/runner/work/Sistema_Ventas_Moderno/Sistema_Ventas_Moderno/SistemaVentas.Tests/SistemaVentas.Tests.csproj /p:EnableWindowsTargeting=true
+
+      - name: Build
+        run: dotnet build /home/runner/work/Sistema_Ventas_Moderno/Sistema_Ventas_Moderno/SistemaVentas.Tests/SistemaVentas.Tests.csproj --configuration Release --no-restore /p:EnableWindowsTargeting=true
+
+      - name: Test with coverage
+        run: dotnet test /home/runner/work/Sistema_Ventas_Moderno/Sistema_Ventas_Moderno/SistemaVentas.Tests/SistemaVentas.Tests.csproj --configuration Release --no-build /p:EnableWindowsTargeting=true --collect:"XPlat Code Coverage"

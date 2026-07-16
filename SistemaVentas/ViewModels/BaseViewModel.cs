@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
 
 namespace SistemaVentas.ViewModels
 {
@@ -39,12 +40,29 @@ namespace SistemaVentas.ViewModels
         protected void ManejarError(string titulo, Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"ERROR [{titulo}]: {ex.Message}");
-            System.Windows.MessageBox.Show(
+            MostrarMensaje(
                 $"Error: {ex.Message}",
                 titulo,
-                System.Windows.MessageBoxButton.OK,
-                System.Windows.MessageBoxImage.Error
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
             );
+        }
+
+        protected virtual void MostrarMensaje(
+            string mensaje,
+            string titulo,
+            MessageBoxButton button = MessageBoxButton.OK,
+            MessageBoxImage icon = MessageBoxImage.None)
+        {
+            MessageBox.Show(mensaje, titulo, button, icon);
+        }
+
+        protected virtual MessageBoxResult MostrarConfirmacion(
+            string mensaje,
+            string titulo,
+            MessageBoxButton button = MessageBoxButton.YesNo)
+        {
+            return MessageBox.Show(mensaje, titulo, button);
         }
     }
 }

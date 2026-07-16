@@ -126,7 +126,7 @@ namespace SistemaVentas.ViewModels
         {
             if (SorteoSeleccionado == null || MontoIngresado <= 0 || string.IsNullOrWhiteSpace(NumeroIngresado))
             {
-                System.Windows.MessageBox.Show("Ingrese datos válidos", "Validación");
+                MostrarMensaje("Ingrese datos válidos", "Validación");
                 return;
             }
 
@@ -170,12 +170,12 @@ namespace SistemaVentas.ViewModels
 
                 if (exito)
                 {
-                    System.Windows.MessageBox.Show($"Venta guardada: {ventaId}", "Éxito");
+                    MostrarMensaje($"Venta guardada: {ventaId}", "Éxito");
                     Limpiar();
                 }
                 else
                 {
-                    System.Windows.MessageBox.Show(mensaje, "Error");
+                    MostrarMensaje(mensaje, "Error");
                 }
             }
             catch (Exception ex)

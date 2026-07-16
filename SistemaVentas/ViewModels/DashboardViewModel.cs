@@ -242,7 +242,7 @@ namespace SistemaVentas.ViewModels
         private void OnCrearVenta()
         {
             // Evento disparado cuando se hace click en "Nueva Venta"
-            System.Windows.MessageBox.Show("Abrir ventana de nueva venta");
+            MostrarMensaje("Abrir ventana de nueva venta", "Información");
         }
 
         private async Task GenerarReporteAsync()
@@ -263,7 +263,7 @@ namespace SistemaVentas.ViewModels
                     $"Ganancia: L {ganancia:N2}{Environment.NewLine}" +
                     $"Transacciones: {transacciones}";
 
-                System.Windows.MessageBox.Show(mensaje, "Reporte");
+                MostrarMensaje(mensaje, "Reporte");
             }
             catch (Exception ex)
             {

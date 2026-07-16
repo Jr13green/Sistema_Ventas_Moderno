@@ -10,11 +10,11 @@ namespace SistemaVentas.Services
     /// </summary>
     public class SorteosService
     {
-        public Task CrearSorteosDelDiaAsync() => Task.CompletedTask;
+        public virtual Task CrearSorteosDelDiaAsync() => Task.CompletedTask;
 
-        public Task ActualizarEstadosSorteosAsync() => Task.CompletedTask;
+        public virtual Task ActualizarEstadosSorteosAsync() => Task.CompletedTask;
 
-        public Task<List<SorteoDiario>> ObtenerSorteosDiarioAsync(DateTime fecha)
+        public virtual Task<List<SorteoDiario>> ObtenerSorteosDiarioAsync(DateTime fecha)
         {
             var items = new List<SorteoDiario>
             {
