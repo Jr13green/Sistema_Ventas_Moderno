@@ -133,13 +133,13 @@ namespace SistemaVentas.ViewModels
                 Cargando = true;
                 var csv = await _reportes.ExportarVentasCSVAsync(FechaInicio, FechaFin);
 
-                var dialogo = new System.Windows.Forms.SaveFileDialog
+                var dialogo = new Microsoft.Win32.SaveFileDialog
                 {
                     FileName = $"Reporte_{DateTime.Now:yyyyMMdd_HHmmss}.csv",
                     Filter = "CSV Files (*.csv)|*.csv"
                 };
 
-                if (dialogo.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                if (dialogo.ShowDialog() == true)
                 {
                     System.IO.File.WriteAllText(dialogo.FileName, csv);
                     System.Windows.MessageBox.Show("Archivo exportado correctamente", "Éxito");
