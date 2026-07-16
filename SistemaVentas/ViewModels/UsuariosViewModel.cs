@@ -115,7 +115,7 @@ namespace SistemaVentas.ViewModels
                         detalle: $"Usuario creado: {NombreNuevo} ({RolSeleccionado})"
                     );
 
-                    System.Windows.MessageBox.Show($"Usuario creado: {usuario.NombreCompleto}", "Éxito");
+                    MostrarMensaje($"Usuario creado: {usuario.NombreCompleto}", "Éxito");
                     await CargarUsuariosAsync();
                     Limpiar();
                 }
@@ -132,7 +132,7 @@ namespace SistemaVentas.ViewModels
 
         private async Task EliminarUsuarioAsync(long usuarioId)
         {
-            if (System.Windows.MessageBox.Show(
+            if (MostrarConfirmacion(
                 "¿Está seguro de eliminar este usuario?",
                 "Confirmar",
                 System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.Yes)

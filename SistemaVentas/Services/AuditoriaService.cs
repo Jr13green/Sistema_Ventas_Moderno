@@ -7,7 +7,7 @@ namespace SistemaVentas.Services
     /// </summary>
     public class AuditoriaService
     {
-        public Task RegistrarAsync(string accion, string modulo, string detalle)
+        public virtual Task RegistrarAsync(string accion, string modulo, string detalle)
         {
             return Task.CompletedTask;
         }

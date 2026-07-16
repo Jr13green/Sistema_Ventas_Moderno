@@ -20,7 +20,7 @@ namespace SistemaVentas.Services
             _baseDatos = baseDatos;
         }
 
-        public Task<Usuario> AutenticarAsync(string nombreUsuario, string contrasena)
+        public virtual Task<Usuario> AutenticarAsync(string nombreUsuario, string contrasena)
         {
             if (string.IsNullOrWhiteSpace(nombreUsuario) || string.IsNullOrWhiteSpace(contrasena))
                 return Task.FromResult<Usuario>(null);
@@ -32,7 +32,7 @@ namespace SistemaVentas.Services
             return Task.FromResult(usuario);
         }
 
-        public Task<(bool exito, string mensaje, long usuarioId)> CrearUsuarioAsync(Usuario usuario, string contrasena)
+        public virtual Task<(bool exito, string mensaje, long usuarioId)> CrearUsuarioAsync(Usuario usuario, string contrasena)
         {
             if (usuario == null || string.IsNullOrWhiteSpace(usuario.NombreUsuario) || string.IsNullOrWhiteSpace(contrasena))
                 return Task.FromResult((false, "Datos incompletos", 0L));
@@ -47,7 +47,7 @@ namespace SistemaVentas.Services
             return Task.FromResult((true, "Usuario creado exitosamente", usuario.Id));
         }
 
-        public Task<List<Usuario>> ObtenerVendedoresActivosAsync()
+        public virtual Task<List<Usuario>> ObtenerVendedoresActivosAsync()
         {
             var usuarios = _usuarios
                 .Where(u => u.Activo && string.Equals(u.Rol, "Vendedor", StringComparison.OrdinalIgnoreCase))
@@ -57,7 +57,7 @@ namespace SistemaVentas.Services
             return Task.FromResult(usuarios);
         }
 
-        public Task<bool> CambiarEstadoUsuarioAsync(long usuarioId, bool activo)
+        public virtual Task<bool> CambiarEstadoUsuarioAsync(long usuarioId, bool activo)
         {
             var usuario = _usuarios.FirstOrDefault(u => u.Id == usuarioId);
             if (usuario == null)
@@ -67,7 +67,7 @@ namespace SistemaVentas.Services
             return Task.FromResult(true);
         }
 
-        public Task<Usuario> ObtenerUsuarioPorIdAsync(long usuarioId)
+        public virtual Task<Usuario> ObtenerUsuarioPorIdAsync(long usuarioId)
         {
             var usuario = _usuarios.FirstOrDefault(u => u.Id == usuarioId);
             return Task.FromResult(usuario);
@@ -76,7 +76,7 @@ namespace SistemaVentas.Services
         /// <summary>
         /// Sobrecarga MVVM para crear usuario desde formulario.
         /// </summary>
-        public async Task<Usuario> CrearUsuarioAsync(string nombreCompleto, string numero, string rol)
+        public virtual async Task<Usuario> CrearUsuarioAsync(string nombreCompleto, string numero, string rol)
         {
             string usuarioBase = (nombreCompleto ?? string.Empty).Trim().ToLower().Replace(" ", ".");
             if (string.IsNullOrWhiteSpace(usuarioBase))
@@ -102,7 +102,7 @@ namespace SistemaVentas.Services
         /// <summary>
         /// Elimina (desactiva) un usuario.
         /// </summary>
-        public Task<bool> EliminarUsuarioAsync(long usuarioId)
+        public virtual Task<bool> EliminarUsuarioAsync(long usuarioId)
         {
             return CambiarEstadoUsuarioAsync(usuarioId, false);
         }

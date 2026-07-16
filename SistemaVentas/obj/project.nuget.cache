@@ -1,10 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "ukYYfDzbfvQ=",
+  "dgSpecHash": "op06LHshtQA=",
   "success": true,
   "projectFilePath": "/home/runner/work/Sistema_Ventas_Moderno/Sistema_Ventas_Moderno/SistemaVentas/SistemaVentas.csproj",
   "expectedPackageFiles": [
-    "/home/runner/.nuget/packages/microsoft.windowsdesktop.app.ref/10.0.9/microsoft.windowsdesktop.app.ref.10.0.9.nupkg.sha512"
+    "/tmp/codeql-scratch-b80683255dee6705/dbs/csharp/working/packages/microsoft.netcore.app.ref/10.0.9/microsoft.netcore.app.ref.10.0.9.nupkg.sha512",
+    "/tmp/codeql-scratch-b80683255dee6705/dbs/csharp/working/packages/microsoft.windowsdesktop.app.ref/10.0.9/microsoft.windowsdesktop.app.ref.10.0.9.nupkg.sha512",
+    "/tmp/codeql-scratch-b80683255dee6705/dbs/csharp/working/packages/microsoft.aspnetcore.app.ref/10.0.9/microsoft.aspnetcore.app.ref.10.0.9.nupkg.sha512",
+    "/tmp/codeql-scratch-b80683255dee6705/dbs/csharp/working/packages/microsoft.netcore.app.host.linux-x64/10.0.9/microsoft.netcore.app.host.linux-x64.10.0.9.nupkg.sha512"
   ],
   "logs": []
 }

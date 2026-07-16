@@ -8,17 +8,17 @@ namespace SistemaVentas.Services
     /// </summary>
     public class CajaService
     {
-        public Task<decimal> ObtenerSaldoCajaAsync(DateTime fecha)
+        public virtual Task<decimal> ObtenerSaldoCajaAsync(DateTime fecha)
         {
             return Task.FromResult(0m);
         }
 
-        public Task RegistrarAjusteAsync(string tipo, decimal monto, string motivo)
+        public virtual Task RegistrarAjusteAsync(string tipo, decimal monto, string motivo)
         {
             return Task.CompletedTask;
         }
 
-        public Task<(decimal totalIngresos, decimal totalEgresos, decimal saldoFinal)> ObtenerResumenCajaPorFechaAsync(DateTime fecha)
+        public virtual Task<(decimal totalIngresos, decimal totalEgresos, decimal saldoFinal)> ObtenerResumenCajaPorFechaAsync(DateTime fecha)
         {
             return Task.FromResult((0m, 0m, 0m));
         }

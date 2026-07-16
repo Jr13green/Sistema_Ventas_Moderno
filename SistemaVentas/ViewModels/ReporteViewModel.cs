@@ -132,17 +132,11 @@ namespace SistemaVentas.ViewModels
             {
                 Cargando = true;
                 var csv = await _reportes.ExportarVentasCSVAsync(FechaInicio, FechaFin);
-
-                var dialogo = new Microsoft.Win32.SaveFileDialog
+                var rutaArchivo = SeleccionarRutaArchivoCsv();
+                if (!string.IsNullOrWhiteSpace(rutaArchivo))
                 {
-                    FileName = $"Reporte_{DateTime.Now:yyyyMMdd_HHmmss}.csv",
-                    Filter = "CSV Files (*.csv)|*.csv"
-                };
-
-                if (dialogo.ShowDialog() == true)
-                {
-                    System.IO.File.WriteAllText(dialogo.FileName, csv);
-                    System.Windows.MessageBox.Show("Archivo exportado correctamente", "Éxito");
+                    GuardarArchivoTexto(rutaArchivo, csv);
+                    MostrarMensaje("Archivo exportado correctamente", "Éxito");
                 }
             }
             catch (Exception ex)
@@ -169,6 +163,22 @@ namespace SistemaVentas.ViewModels
         private bool PuedeExportar()
         {
             return TotalVentas > 0 && !Cargando;
+        }
+
+        protected virtual string SeleccionarRutaArchivoCsv()
+        {
+            var dialogo = new Microsoft.Win32.SaveFileDialog
+            {
+                FileName = $"Reporte_{DateTime.Now:yyyyMMdd_HHmmss}.csv",
+                Filter = "CSV Files (*.csv)|*.csv"
+            };
+
+            return dialogo.ShowDialog() == true ? dialogo.FileName : string.Empty;
+        }
+
+        protected virtual void GuardarArchivoTexto(string ruta, string contenido)
+        {
+            System.IO.File.WriteAllText(ruta, contenido);
         }
 
         #endregion

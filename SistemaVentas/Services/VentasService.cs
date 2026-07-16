@@ -10,12 +10,12 @@ namespace SistemaVentas.Services
     /// </summary>
     public class VentasService
     {
-        public Task<decimal> ObtenerTotalVentasActivasPorFechaAsync(DateTime fecha)
+        public virtual Task<decimal> ObtenerTotalVentasActivasPorFechaAsync(DateTime fecha)
         {
             return Task.FromResult(0m);
         }
 
-        public Task<(bool exito, string mensaje, long ventaId)> CrearVentaAsync(
+        public virtual Task<(bool exito, string mensaje, long ventaId)> CrearVentaAsync(
             long usuarioId,
             List<(long sorteoDiarioId, string numero, decimal monto)> jugadas)
         {
